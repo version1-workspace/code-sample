@@ -40,8 +40,8 @@ export default class HTTPClient {
     };
   }
 
-  async get(path: string) {
-    return this.request("GET", path);
+  async get<O>(path: string): Promise<HTTPResponse<O>> {
+    return this.request<void, O>("GET", path);
   }
 
   async post<I, O>(path: string, data: I) {
@@ -52,7 +52,7 @@ export default class HTTPClient {
     return this.request<I, O>("PATCH", path, data);
   }
 
-  async delete<I, O>(path: string) {
-    return this.request<I, O>("DELETE", path);
+  async delete<O>(path: string) {
+    return this.request<void, O>("DELETE", path);
   }
 }

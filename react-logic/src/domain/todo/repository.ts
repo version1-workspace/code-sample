@@ -1,33 +1,47 @@
 import HTTPClient from "../../lib/httpclient";
 import { Todo, TodoParams } from "./entity";
 
-let _client: HTTPClient;
 const baseURL = "https://localhost:8000";
 
-const client = () => {
-  if (!_client) {
-    _client = new HTTPClient(baseURL);
+export const createTodoRepository = () => {
+  return new TodoRepository(new HTTPClient(baseURL));
+};
+
+interface Client {
+  get: <T>(path: string) => Promise<{ body: T }>;
+  post: <I, O>(path: string, data: I) => Promise<{ body: O }>;
+  patch: <I, O>(path: string, data: I) => Promise<{ body: O }>;
+  delete: <O>(path: string) => Promise<{ body: O }>;
+}
+
+export class TodoRepository {
+  client: Client;
+  constructor(client: Client) {
+    this.client = client;
   }
 
-  return _client;
-};
+  async fetchTodos(search: string): Promise<Todo[]> {
+    const response = await this.client.get<TodoParams[]>(
+      `/todos?search=${search}`,
+    );
+    return response.body.map((todo: any) => {
+      return new Todo(todo);
+    });
+  }
 
-export const fetchTodos = async (search: string): Promise<Todo[]> => {
-  const response = await client().get<TodoParams[]>(`/todos?search=${search}`);
-  return response.body.data.map((todo: any) => {
-    return new Todo(todo);
-  });
-};
+  async createTodo(title: string): Promise<void> {
+    await this.client.post<{ title: string }, void>(`/todos`, { title });
+  }
 
-export const createTodo = async (title: string): Promise<void> => {
-  await client().post<void>(`/todos`, { title });
-};
+  async bulkDone(ids: number[]): Promise<number[]> {
+    const response = await this.client.patch<
+      { ids: number[] },
+      { ids: number[] }
+    >(`/todos/bulk`, { ids });
+    return response.body.ids;
+  }
 
-export const bulkDone = async (ids: number[]): Promise<number[]> => {
-  const response = await client().patch<number[]>(`/todos/bulk`, { ids });
-  return response.body.data;
-};
-
-export const deleteTodo = async (id: number): Promise<void> => {
-  await client().delete<void>(`/todos/${id}`);
-};
+  async deleteTodo(id: number): Promise<void> {
+    await this.client.delete<void>(`/todos/${id}`);
+  }
+}

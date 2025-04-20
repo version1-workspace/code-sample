@@ -35,6 +35,22 @@ export default function BadExample() {
       });
   };
 
+  const handleDelete = (id: number) => {
+    fetch(`https://localhost:8000/todos/${id}`, {
+      method: "DELETE",
+    }).then(() => {
+      fetch("https://localhost:8000/todos", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then((body) => setTodos(body.data));
+    });
+    alert("削除が完了しました");
+  };
+
   const handleBulkDone = () => {
     fetch(`https://localhost:8000/todos/bulk`, {
       method: "PATCH",
@@ -57,21 +73,6 @@ export default function BadExample() {
     });
   };
 
-  const handleDelete = (id: number) => {
-    fetch(`https://localhost:8000/todos/${id}`, {
-      method: "DELETE",
-    }).then(() => {
-      fetch("https://localhost:8000/todos", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((res) => res.json())
-        .then((body) => setTodos(body.data));
-    });
-    alert("削除が完了しました");
-  };
 
   return (
     <div>
