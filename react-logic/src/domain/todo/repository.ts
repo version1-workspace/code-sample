@@ -8,7 +8,7 @@ export const createTodoRepository = () => {
 };
 
 interface Client {
-  get: <T>(path: string) => Promise<{ body: T }>;
+  get: <O>(path: string) => Promise<{ body: O }>;
   post: <I, O>(path: string, data: I) => Promise<{ body: O }>;
   patch: <I, O>(path: string, data: I) => Promise<{ body: O }>;
   delete: <O>(path: string) => Promise<{ body: O }>;
@@ -20,16 +20,16 @@ export class TodoRepository {
     this.client = client;
   }
 
-  async fetchTodos(search: string): Promise<Todo[]> {
+  async fetch(search: string): Promise<Todo[]> {
     const response = await this.client.get<TodoParams[]>(
       `/todos?search=${search}`,
     );
-    return response.body.map((todo: any) => {
+    return response.body.map((todo: TodoParams) => {
       return new Todo(todo);
     });
   }
 
-  async createTodo(title: string): Promise<void> {
+  async create(title: string): Promise<void> {
     await this.client.post<{ title: string }, void>(`/todos`, { title });
   }
 
@@ -41,7 +41,7 @@ export class TodoRepository {
     return response.body.ids;
   }
 
-  async deleteTodo(id: number): Promise<void> {
+  async delete(id: number): Promise<void> {
     await this.client.delete<void>(`/todos/${id}`);
   }
 }

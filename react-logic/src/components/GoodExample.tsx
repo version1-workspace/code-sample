@@ -1,7 +1,8 @@
 import { useState, useEffect, FormEvent } from "react";
 import TodoList from "../components/todo/list";
 import { useTodos } from "../hooks/useTodos";
-import { useSelected } from "../hooks/useSelected";
+import { useSelect } from "../hooks/useSelect";
+import { createTodoRepository } from "../domain/todo/repository";
 
 export default function GoodExample() {
   const [form, setForm] = useState({
@@ -12,9 +13,9 @@ export default function GoodExample() {
     isSelected,
     toggle: toggleSelect,
     clear: clearSelect,
-  } = useSelected();
+  } = useSelect();
   const { todos, search, fetch, add, remove, bulkDone, handleChangeSearch } =
-    useTodos();
+    useTodos(createTodoRepository());
 
   useEffect(() => {
     fetch();

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const useSelected = () => {
+export const useSelect = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
   const isSelected = (item: string) => {

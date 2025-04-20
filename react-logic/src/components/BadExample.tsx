@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from "react";
-import { Todo } from "../models/todo";
+import { Todo } from "../domain/todo/entity";
 
 export default function BadExample() {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -72,7 +72,6 @@ export default function BadExample() {
       setSelected([]);
     });
   };
-
 
   return (
     <div>
