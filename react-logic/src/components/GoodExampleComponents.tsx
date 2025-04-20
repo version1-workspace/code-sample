@@ -1,84 +1,62 @@
 import { useState, useEffect, FormEvent } from "react";
 import { Todo } from "../models/todo";
+import {
+  fetchTodos,
+  bulkDone,
+  createTodo,
+  deleteTodo,
+} from "../domain/todo/repository";
 
-export default function BadExample() {
+export default function GoodExample() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [selected, setSelected] = useState<Todo[]>([]);
   const [search, setSearch] = useState("");
+  const [form, setForm] = useState({
+    title: "",
+  });
 
   useEffect(() => {
-    // データ取得ロジックがコンポーネントに直書き
-    fetch(`https://localhost:8000/todos?search=${search}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => setTodos(data));
+    const init = async () => {
+      const todos = await fetchTodos(search);
+      setTodos(todos);
+    };
+
+    init();
   }, []);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    fetch("https://localhost:8000/todos", {
-      method: "POST",
-      body: JSON.stringify({ name: search }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((body) => {
-        setTodos([...todos, body.data]);
-      });
+    await createTodo(form.title);
+    const todos = await fetchTodos(search);
+    setTodos(todos);
   };
 
-  const handleBulkDone = () => {
-    fetch(`https://localhost:8000/todos/bulk`, {
-      method: "PATCH",
-      body: JSON.stringify({ ids: selected.map((todo) => todo.id) }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then(() => {
-      alert("更新が完了しました");
-      setTodos(
-        todos.map((todo) => {
-          if (selected.find((s) => s.id === todo.id)) {
-            return { ...todo, done: true };
-          }
-          return todo;
-        }),
-      );
-
-      setSelected([]);
-    });
+  const handleBulkDone = async () => {
+    await bulkDone(selected.map((todo) => todo.id));
+    await fetchTodos(search);
+    setSelected([]);
+    alert("更新が完了しました");
   };
 
-  const handleDelete = (id: number) => {
-    fetch(`https://localhost:8000/todos/${id}`, {
-      method: "DELETE",
-    }).then(() => {
-      fetch("https://localhost:8000/todos", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((res) => res.json())
-        .then((body) => setTodos(body.data));
-    });
+  const handleDelete = async (id: number) => {
+    await deleteTodo(id);
+    const todos = await fetchTodos(search);
+    setTodos(todos);
+    alert("削除が完了しました");
   };
 
-  // フィルタ処理も JSX に直接書かれている
+  const filteredTodos = todos.filter((todo) =>
+    todo.title.toLowerCase().includes(search.toLowerCase()),
+  );
+
   return (
     <div>
       <h1>Todo List</h1>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={form.title}
+          onChange={(e) => setForm({ title: e.target.value })}
         />
         <button type="submit">Add</button>
       </form>
@@ -97,36 +75,32 @@ export default function BadExample() {
         </div>
         <div className="list-content">
           <ul>
-            {todos
-              .filter((todo) =>
-                todo.title.toLowerCase().includes(search.toLowerCase()),
-              )
-              .map((todo) => (
-                <li key={todo.id}>
+            {filteredTodos.map((todo) => (
+              <li key={todo.id}>
+                <div>
                   <div>
-                    <div>
-                      <input
-                        type="checkbox"
-                        onClick={(e) => {
-                          setSelected((prev) => {
-                            if (e.currentTarget.checked) {
-                              return [...prev, todo];
-                            } else {
-                              return prev.filter((t) => t.id !== todo.id);
-                            }
-                          });
-                        }}
-                      />
-                    </div>
-                    <div>{todo.title}</div>
-                    <div>
-                      <button onClick={() => handleDelete(todo.id)}>
-                        Delete
-                      </button>
-                    </div>
+                    <input
+                      type="checkbox"
+                      onClick={(e) => {
+                        setSelected((prev) => {
+                          if (e.currentTarget.checked) {
+                            return [...prev, todo];
+                          } else {
+                            return prev.filter((t) => t.id !== todo.id);
+                          }
+                        });
+                      }}
+                    />
                   </div>
-                </li>
-              ))}
+                  <div>{todo.title}</div>
+                  <div>
+                    <button onClick={() => handleDelete(todo.id)}>
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

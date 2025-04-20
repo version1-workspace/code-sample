@@ -5,9 +5,11 @@ export default function BadExample() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [selected, setSelected] = useState<Todo[]>([]);
   const [search, setSearch] = useState("");
+  const [form, setForm] = useState({
+    title: "",
+  });
 
   useEffect(() => {
-    // データ取得ロジックがコンポーネントに直書き
     fetch(`https://localhost:8000/todos?search=${search}`, {
       method: "GET",
       headers: {
@@ -68,17 +70,17 @@ export default function BadExample() {
         .then((res) => res.json())
         .then((body) => setTodos(body.data));
     });
+    alert("削除が完了しました");
   };
 
-  // フィルタ処理も JSX に直接書かれている
   return (
     <div>
       <h1>Todo List</h1>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={form.title}
+          onChange={(e) => setForm({ title: e.target.value })}
         />
         <button type="submit">Add</button>
       </form>
