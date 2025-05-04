@@ -12,8 +12,6 @@ export function useField({ size, mineCount }: Settings) {
   const [revealed, setRevealed] = useState(new PositionSet());
   const [hints, setHints] = useState<Hints>(new Hints(size, mines));
 
-  const totalCells = settings.size * settings.size;
-
   function reset() {
     setFlags(new PositionSet());
     setRevealed(new PositionSet());
@@ -27,105 +25,31 @@ export function useField({ size, mineCount }: Settings) {
     reset();
   }
 
-  function revealCellRecursively(
-    set: PositionSet,
-    mines: PositionSet,
-    hints: number[],
-    row: number,
-    col: number,
-  ) {
-    const pos = new Position(row, col);
-    for (let row = -1; row <= 1; row++) {
-      for (let col = -1; col <= 1; col++) {
-        const newRow = pos.row + row;
-        const newCol = pos.col + col;
-        if (newRow < 0 || newRow >= size || newCol < 0 || newCol >= size) {
-          continue;
-        }
-
-        const index = newRow * size + newCol;
-        const target = Position.fromIndex(index, size);
-        console.log("target", index, target, set);
-        if (set.has(target) || mines.has(target)) {
-          continue;
-        }
-
-        set.add(target);
-        if (hints[index] > 0) {
-          continue;
-        }
-
-        const res = revealCellRecursively(set, mines, hints, newRow, newCol);
-        set.add(...res.asArray);
-      }
-    }
-
-    return set;
-  }
-
   function revealCell(
     row: number,
     col: number,
     mines: PositionSet,
     hints: number[],
   ) {
-    const cloned = revealed.cloned();
-    cloned.add(new Position(row, col));
-    const newRevealed = revealCellRecursively(cloned, mines, hints, row, col);
-
-    setRevealed(newRevealed);
-
-    return cloned;
+    // TODO: Implement
+    return revealed;
   }
 
   function revealMines() {
     const cloned = revealed.cloned();
-    mines.asArray.forEach((pos) => {
-      cloned.add(pos);
-    });
+    // TODO: Implement
     setRevealed(cloned);
   }
 
   function toggleFlag(row: number, col: number) {
-    const pos = new Position(row, col);
-    if (revealed.has(pos)) {
-      return;
-    }
-
-    if (flags.has(pos)) {
-      setFlags((prev) => {
-        const cloned = prev.cloned();
-        cloned.delete(pos);
-        return cloned;
-      });
-    } else {
-      setFlags((prev) => {
-        const cloned = prev.cloned();
-        cloned.add(pos);
-        return cloned;
-      });
-    }
+    // TODO: Implement
   }
 
   function assignMines(mineCount: number) {
     const mines = new PositionSet();
-
-    while (mines.size < mineCount) {
-      const index = Math.floor(Math.random() * totalCells);
-      const position = Position.fromIndex(index, size);
-      if (mines.has(position)) {
-        continue;
-      }
-
-      if (revealed.has(position)) {
-        continue;
-      }
-
-      mines.add(position);
-    }
+    // TODO: Implement
 
     setMines(mines);
-
     return mines;
   }
 

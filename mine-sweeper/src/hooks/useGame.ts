@@ -1,8 +1,8 @@
-import { useField } from "./useField";
-import { useDifficulty } from "./useDifficulty";
-import { useStatus } from "./useStatus";
-import { useTimer } from "./useTimer";
 import { Position } from "../domains/board/models";
+import { useField } from "../hooks/useField";
+import { useStatus } from "../hooks/useStatus";
+import { useTimer } from "../hooks/useTimer";
+import { useDifficulty } from "../hooks/useDifficulty";
 
 export function useGame() {
   const { timer, start: startTimer, stop: stopTimer, reset } = useTimer();

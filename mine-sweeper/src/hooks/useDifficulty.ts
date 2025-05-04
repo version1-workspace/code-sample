@@ -2,16 +2,11 @@ import { useState } from "react";
 import { DifficultyKey, difficulties } from "../domains/game/models/difficulty";
 
 export function useDifficulty() {
-  const [difficulty, setDifficulty] = useState(difficulties.easy);
-
-  const change = (difficulty: DifficultyKey) => {
-    const d = difficulties[difficulty];
-    setDifficulty(d);
-    return d;
-  };
-
+  // TODO: Implement
   return {
-    difficulty,
-    change,
+    difficulty: difficulties.medium,
+    change: (key: DifficultyKey) => {
+      return difficulties.medium;
+    },
   };
 }
