@@ -31,8 +31,12 @@ export function useField({ size, mineCount }: Settings) {
     mines: PositionSet,
     hints: number[],
   ) {
-    // TODO: Implement
-    return revealed;
+    const cloned = revealed.cloned();
+    const position = new Position(row, col);
+    cloned.add(position);
+
+    setRevealed(cloned);
+    return cloned;
   }
 
   function revealMines() {
