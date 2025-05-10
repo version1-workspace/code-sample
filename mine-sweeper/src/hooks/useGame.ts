@@ -56,7 +56,7 @@ export function useGame() {
     if (isInitial) {
       start();
       startTimer();
-      const mines = assignMines(difficulty.value.mineCount);
+      const mines = assignMines(difficulty.value.mineCount, pos);
       const hints = calculateHints(mines);
       revealCell(pos.row, pos.col, mines, hints.asArray());
       return;

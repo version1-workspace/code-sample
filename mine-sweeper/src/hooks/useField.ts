@@ -35,6 +35,10 @@ export function useField({ size, mineCount }: Settings) {
     col: number,
   ) {
     const pos = new Position(row, col);
+    if (hints[pos.index(size)] > 0) {
+      return set;
+    }
+
     for (let row = -1; row <= 1; row++) {
       for (let col = -1; col <= 1; col++) {
         const newRow = pos.row + row;
@@ -107,7 +111,7 @@ export function useField({ size, mineCount }: Settings) {
     }
   }
 
-  function assignMines(mineCount: number) {
+  function assignMines(mineCount: number, target: Position) {
     const mines = new PositionSet();
 
     while (mines.size < mineCount) {
@@ -117,7 +121,7 @@ export function useField({ size, mineCount }: Settings) {
         continue;
       }
 
-      if (revealed.has(position)) {
+      if (target.is(position)) {
         continue;
       }
 
