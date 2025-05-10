@@ -41,7 +41,9 @@ export function useField({ size, mineCount }: Settings) {
 
   function revealMines() {
     const cloned = revealed.cloned();
-    // TODO: Implement
+    mines.asArray.forEach((pos: Position) => {
+      cloned.add(pos);
+    });
     setRevealed(cloned);
   }
 
@@ -49,9 +51,22 @@ export function useField({ size, mineCount }: Settings) {
     // TODO: Implement
   }
 
-  function assignMines(mineCount: number) {
+  function assignMines(mineCount: number, target: Position) {
     const mines = new PositionSet();
-    // TODO: Implement
+
+    for (let i = 0; i < mineCount; i++) {
+      let row = Math.floor(Math.random() * size);
+      let col = Math.floor(Math.random() * size);
+      while (
+        mines.has(new Position(row, col)) ||
+        target.is(new Position(row, col))
+      ) {
+        row = Math.floor(Math.random() * size);
+        col = Math.floor(Math.random() * size);
+      }
+
+      mines.add(new Position(row, col));
+    }
 
     setMines(mines);
     return mines;
