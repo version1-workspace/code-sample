@@ -27,7 +27,30 @@ export class Hints {
 
 function traverseAndCalculate(size: number, mines: PositionSet): number[] {
   const hints = new Array(size * size).fill(0);
-  // TODO: Implement
+  for (let i = 0; i < size * size; i++) {
+    const pos = Position.fromIndex(i, size);
+    if (mines.has(pos)) {
+      hints[i] = -1; // -1 indicates a mine
+      continue;
+    }
+
+    const neighbors = [
+      new Position(pos.row - 1, pos.col - 1),
+      new Position(pos.row - 1, pos.col),
+      new Position(pos.row - 1, pos.col + 1),
+      new Position(pos.row, pos.col - 1),
+      new Position(pos.row, pos.col + 1),
+      new Position(pos.row + 1, pos.col - 1),
+      new Position(pos.row + 1, pos.col),
+      new Position(pos.row + 1, pos.col + 1),
+    ];
+
+    for (const neighbor of neighbors) {
+      if (mines.has(neighbor)) {
+        hints[i]++;
+      }
+    }
+  }
 
   return hints;
 }
