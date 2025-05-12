@@ -25,6 +25,45 @@ export function useField({ size, mineCount }: Settings) {
     reset();
   }
 
+  function revealCellRecursively(
+    set: PositionSet,
+    mines: PositionSet,
+    hints: number[],
+    row: number,
+    col: number,
+  ) {
+    const pos = new Position(row, col);
+    if (hints[pos.index(size)] > 0) {
+      return set;
+    }
+
+    for (let row = -1; row <= 1; row++) {
+      for (let col = -1; col <= 1; col++) {
+        const newRow = pos.row + row;
+        const newCol = pos.col + col;
+        if (newRow < 0 || newRow >= size || newCol < 0 || newCol >= size) {
+          continue;
+        }
+
+        const index = newRow * size + newCol;
+        const target = Position.fromIndex(index, size);
+        if (set.has(target) || mines.has(target)) {
+          continue;
+        }
+
+        set.add(target);
+        if (hints[index] > 0) {
+          continue;
+        }
+
+        const res = revealCellRecursively(set, mines, hints, newRow, newCol);
+        set.add(...res.asArray);
+      }
+    }
+
+    return set;
+  }
+
   function revealCell(
     row: number,
     col: number,
@@ -34,8 +73,9 @@ export function useField({ size, mineCount }: Settings) {
     const cloned = revealed.cloned();
     const position = new Position(row, col);
     cloned.add(position);
+    const newRevealed = revealCellRecursively(cloned, mines, hints, row, col);
 
-    setRevealed(cloned);
+    setRevealed(newRevealed);
     return cloned;
   }
 
