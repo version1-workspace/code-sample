@@ -48,7 +48,19 @@ export function useField({ size, mineCount }: Settings) {
   }
 
   function toggleFlag(row: number, col: number) {
-    // TODO: Implement
+    const cloned = flags.cloned();
+    const position = new Position(row, col);
+    if (revealed.has(position)) {
+      return;
+    }
+
+    if (cloned.has(position)) {
+      cloned.delete(position);
+    } else {
+      cloned.add(position);
+    }
+
+    setFlags(cloned);
   }
 
   function assignMines(mineCount: number, target: Position) {
